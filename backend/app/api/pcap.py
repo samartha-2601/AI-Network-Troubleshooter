@@ -6,7 +6,13 @@ from fastapi import (
     File
 )
 
-from app.analyzers.pcap_analyzer import analyze_pcap
+from app.analyzers.pcap_analyzer import (
+    analyze_pcap
+)
+
+from app.ai.diagnostics import (
+    generate_diagnostic_report
+)
 
 router = APIRouter(
     prefix="/pcap",
@@ -14,6 +20,7 @@ router = APIRouter(
 )
 
 UPLOAD_DIR = "uploads"
+
 
 @router.post("/upload")
 async def upload_pcap(
@@ -32,10 +39,21 @@ async def upload_pcap(
 
         buffer.write(content)
 
-    # Analyze PCAP
-    analysis_results = analyze_pcap(file_path)
+    # Run packet analysis
+    analysis_results = analyze_pcap(
+        file_path
+    )
+
+    # Generate AI diagnostics
+    ai_report = generate_diagnostic_report(
+        analysis_results
+    )
 
     return {
+
         "filename": file.filename,
-        "analysis": analysis_results
+
+        "analysis": analysis_results,
+
+        "ai_diagnostic_report": ai_report
     }
