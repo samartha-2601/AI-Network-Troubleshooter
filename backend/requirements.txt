@@ -4,6 +4,7 @@ anyio==4.13.0
 appdirs==1.4.4
 bcrypt==5.0.0
 certifi==2026.5.20
+charset-normalizer==3.4.7
 click==8.4.1
 distro==1.9.0
 dnspython==2.8.0
@@ -20,6 +21,7 @@ lxml==6.1.1
 openai==2.38.0
 packaging==26.2
 passlib==1.7.4
+pillow==12.2.0
 psycopg2-binary==2.9.12
 pyasn1==0.6.3
 pydantic==2.13.4
@@ -28,6 +30,7 @@ pyshark==0.6
 python-dotenv==1.2.2
 python-jose==3.5.0
 python-multipart==0.0.29
+reportlab==4.5.1
 rsa==4.9.1
 scapy==2.7.0
 six==1.17.0
