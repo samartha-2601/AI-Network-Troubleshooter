@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 import {
@@ -13,8 +13,12 @@ import {
 
 function App() {
   const [file, setFile] = useState(null);
+
   const [results, setResults] = useState(null);
+
   const [loading, setLoading] = useState(false);
+
+  const [history, setHistory] = useState([]);
 
   const handleUpload = async () => {
     if (!file) return;
@@ -31,6 +35,7 @@ function App() {
       );
 
       setResults(response.data);
+      fetchHistory();
     } catch (error) {
       console.error(error);
       alert("Upload failed");
@@ -51,6 +56,37 @@ function App() {
     return "LOW";
   };
 
+
+  const severityColor = (severity) => {
+
+    if (severity === "HIGH")
+      return "text-red-500";
+
+    if (severity === "MEDIUM")
+      return "text-yellow-400";
+
+    return "text-green-400";
+  };
+
+  const fetchHistory = async () => {
+
+    try {
+
+      const response = await axios.get(
+        "http://127.0.0.1:8000/history/"
+      );
+
+      setHistory(response.data);
+
+    } catch (error) {
+
+      console.error(
+        "History fetch failed",
+        error
+      );
+    }
+  };
+
   const protocolData = results
     ? Object.entries(results.analysis.protocols).map(
         ([name, value]) => ({
@@ -66,6 +102,12 @@ function App() {
         count,
       }))
     : [];
+
+  useEffect(() => {
+
+    fetchHistory();
+
+  }, []);
 
 
 
@@ -89,6 +131,60 @@ function App() {
         >
           {loading ? "Analyzing..." : "Upload PCAP"}
         </button>
+      </div>
+
+
+      {/* Analysis History */}
+
+      <div className="bg-slate-800 p-6 rounded-xl mb-8">
+
+        <h2 className="text-2xl font-semibold mb-4">
+          Previous Analyses
+        </h2>
+
+        {history.length === 0 ? (
+
+          <p>No analysis history found.</p>
+
+        ) : (
+
+          <div className="space-y-3">
+
+            {history.map((item) => (
+
+              <div
+                key={item.id}
+                className="bg-slate-700 p-4 rounded-lg flex justify-between items-center"
+              >
+
+                <div>
+
+                  <div className="font-semibold">
+                    {item.filename}
+                  </div>
+
+                  <div className="text-sm text-slate-400">
+                    {item.packet_count} packets
+                  </div>
+
+                </div>
+
+                <div
+                  className={`font-bold ${severityColor(
+                    item.severity
+                  )}`}
+                >
+                  {item.severity}
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        )}
+
       </div>
 
       {results && (
