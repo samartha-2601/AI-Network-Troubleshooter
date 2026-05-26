@@ -17,6 +17,15 @@ def analyze_pcap(file_path):
 
     packet_count = 0
 
+    # New Intelligence Features
+    top_ports = Counter()
+
+    tls_versions = Counter()
+
+    http_hosts = set()
+
+    user_agents = set()
+
     try:
 
         command = [
@@ -39,7 +48,19 @@ def analyze_pcap(file_path):
             "dns.qry.name",
 
             "-e",
-            "tcp.flags"
+            "tcp.flags",
+
+            "-e",
+            "tcp.dstport",
+
+            "-e",
+            "tls.record.version",
+
+            "-e",
+            "http.host",
+
+            "-e",
+            "http.user_agent"
         ]
 
         result = subprocess.run(
@@ -66,6 +87,14 @@ def analyze_pcap(file_path):
 
             tcp_flags = parts[4] if len(parts) > 4 else None
 
+            dst_port = parts[5] if len(parts) > 5 else None
+
+            tls_version = parts[6] if len(parts) > 6 else None
+
+            http_host = parts[7] if len(parts) > 7 else None
+
+            user_agent = parts[8] if len(parts) > 8 else None
+
             # Protocol statistics
             protocols[protocol] += 1
 
@@ -79,6 +108,31 @@ def analyze_pcap(file_path):
             # DNS extraction
             if dns_query:
                 dns_queries.append(dns_query)
+
+            # Port Analysis
+            if dst_port:
+                top_ports[dst_port] += 1
+
+            # TLS Analysis
+            if tls_version:
+
+                versions = tls_version.split(",")
+
+                for version in versions:
+
+                    version = version.strip()
+
+                    if version:
+
+                        tls_versions[version] += 1
+
+            # HTTP Hosts
+            if http_host:
+                http_hosts.add(http_host)
+
+            # User Agents
+            if user_agent:
+                user_agents.add(user_agent)
 
             # TCP handshake analysis
             if tcp_flags:
@@ -124,6 +178,36 @@ def analyze_pcap(file_path):
                 "Possible failed TCP connections detected"
             )
 
+        # Port Scan Detection
+        if len(top_ports) > 20:
+
+            potential_issues.append(
+                "Possible port scanning activity detected"
+            )
+
+        def normalize_tls_versions(tls_versions):
+
+            normalized = Counter()
+
+            version_map = {
+
+                "0x0301": "TLS 1.0",
+                "0x0302": "TLS 1.1",
+                "0x0303": "TLS 1.2",
+                "0x0304": "TLS 1.3"
+            }
+
+            for version, count in tls_versions.items():
+
+                normalized_name = version_map.get(
+                    version,
+                    version
+                )
+
+                normalized[normalized_name] += count
+
+            return dict(normalized)
+
         return {
 
             "packet_count": packet_count,
@@ -142,6 +226,16 @@ def analyze_pcap(file_path):
 
                 "possible_failed_connections": failed_connections
             },
+
+            # NEW FEATURES
+
+            "top_ports": top_ports.most_common(10),
+
+            "tls_versions": normalize_tls_versions(tls_versions),
+
+            "http_hosts": list(http_hosts)[:20],
+
+            "user_agents": list(user_agents)[:20],
 
             "potential_issues": potential_issues
         }
