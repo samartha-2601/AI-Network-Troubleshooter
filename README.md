@@ -189,32 +189,33 @@ Generate a professional PDF report for documentation and investigation.
 
 # Screenshots
 
-## Dashboard
+## Dashboard Overview
 
-```markdown
-![Dashboard1](screenshots/dashboard1.png)
-```
-```markdown
-![Dashboard2](screenshots/dashboard2.png)
-```
+![Dashboard Overview](screenshots/dashboard1.png)
 
-## AI Report
+---
 
-```markdown
-![AI-Report](screenshots/aireport.png)
-```
+## Advanced Network Intelligence
+
+![Advanced Intelligence](screenshots/dashboard2.png)
+
+---
+
+## AI Diagnostic Report
+
+![AI Report](screenshots/aireport.png)
+
+---
 
 ## Analysis History
 
-```markdown
 ![History](screenshots/history.png)
-```
 
-## PDF Report
+---
 
-```markdown
+## PDF Export
+
 ![PDF Report](screenshots/report.png)
-```
 
 ---
 
