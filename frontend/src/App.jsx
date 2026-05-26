@@ -87,6 +87,15 @@ function App() {
     }
   };
 
+  const downloadReport = (reportId) => {
+
+    window.open(
+      `http://127.0.0.1:8000/reports/${reportId}`,
+      "_blank"
+    );
+
+  };
+
   const protocolData = results
     ? Object.entries(results.analysis.protocols).map(
         ([name, value]) => ({
@@ -163,14 +172,30 @@ function App() {
                     {item.filename}
                   </div>
 
-                  <div className="text-sm text-slate-400">
+                  <div className="text-sm text-slate-400 mb-2">
                     {item.packet_count} packets
                   </div>
+
+                  <button
+                    onClick={() =>
+                      downloadReport(item.id)
+                    }
+                    className="
+                      bg-green-600
+                      hover:bg-green-700
+                      px-3
+                      py-1
+                      rounded-lg
+                      text-sm
+                    "
+                  >
+                    Download PDF
+                  </button>
 
                 </div>
 
                 <div
-                  className={`font-bold ${severityColor(
+                  className={`font-bold text-lg ${severityColor(
                     item.severity
                   )}`}
                 >
